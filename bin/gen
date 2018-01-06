@@ -1,0 +1,113 @@
+#!/usr/bin/env node
+
+const fs = require('fs')
+const path = require('path')
+const chalk = require('chalk')
+const prog = require('caporal')
+
+const createFeatureFolder = feature => {
+  const featureFolder = path.join(__dirname, '..', 'src', feature)
+
+  if (!fs.existsSync(featureFolder)) {
+    fs.mkdirSync(featureFolder)
+    fs.mkdirSync(path.join(featureFolder, 'components'))
+    fs.mkdirSync(path.join(featureFolder, 'containers'))
+  }
+
+  return featureFolder
+}
+
+const createContainer = (feature, container) => {
+  const featureFolder = createFeatureFolder(feature)
+  const containerFile = path.join(
+    featureFolder,
+    'containers',
+    `${container}.jsx`
+  )
+
+  if (fs.existsSync(containerFile)) {
+    console.error(
+      `You already have a ${chalk.bold(
+        container
+      )} container in the feature ${chalk.bold(feature)} already exists`
+    )
+    process.exit(1)
+  }
+
+  fs.writeFileSync(
+    containerFile,
+    `import React, { Component } from 'react'
+
+class ${container} extends Component {
+  render() {
+    return <div>${container}</div>;
+  }
+}
+
+export default ${container}
+`
+  )
+}
+
+const createComponent = (feature, component) => {
+  const featureFolder = createFeatureFolder(feature)
+  const componentFolder = path.join(featureFolder, 'components', component)
+
+  if (fs.existsSync(componentFolder)) {
+    console.error(
+      `You already have a ${chalk.bold(
+        component
+      )} component in the feature ${chalk.bold(feature)}`
+    )
+    process.exit(1)
+  }
+
+  fs.mkdirSync(componentFolder)
+  fs.writeFileSync(
+    path.join(componentFolder, 'index.jsx'),
+    `import React, { Component } from 'react'
+
+import styles from './index.css'
+
+class ${component} extends Component {
+  render() {
+    return <div className={styles.root}>${component}</div>;
+  }
+}
+
+export default ${component}
+`
+  )
+
+  fs.writeFileSync(
+    path.join(componentFolder, 'index.css'),
+    `.root {
+}
+`
+  )
+}
+
+prog
+  .version('1.0.0')
+  .command('create')
+  .argument(
+    '<type>',
+    'type of component to create',
+    /^component|page|container$/,
+    'component'
+  )
+  .argument(
+    '<feature>',
+    'the feature in which to create the component',
+    /^[a-z]+.*$/
+  )
+  .argument('<name>', 'name of the', /^[A-Z]+.*$/)
+  .action(({ feature, name, type }) => {
+    if (type === 'component') {
+      createComponent(feature, name)
+    } else if (type === 'container') {
+      createContainer(feature, name)
+    }
+  })
+
+prog.parse(process.argv)

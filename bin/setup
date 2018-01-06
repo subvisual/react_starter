@@ -1,0 +1,10 @@
+#!/bin/bash
+
+hash yarn &> /dev/null
+
+if [ $? -eq 1 ]; then
+  echo "yarn not found, please install it first"
+  exit 1
+fi
+
+yarn install
