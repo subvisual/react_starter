@@ -12,9 +12,38 @@ const createFeatureFolder = feature => {
     fs.mkdirSync(featureFolder)
     fs.mkdirSync(path.join(featureFolder, 'components'))
     fs.mkdirSync(path.join(featureFolder, 'containers'))
+    fs.mkdirSync(path.join(featureFolder, 'pages'))
   }
 
   return featureFolder
+}
+
+const createPage = (feature, page) => {
+  const featureFolder = createFeatureFolder(feature)
+  const pageFile = path.join(featureFolder, 'pages', `${page}.jsx`)
+
+  if (fs.existsSync(pageFile)) {
+    console.error(
+      `You already have a ${chalk.bold(page)} page in the feature ${chalk.bold(
+        feature
+      )} already exists`
+    )
+    process.exit(1)
+  }
+
+  fs.writeFileSync(
+    pageFile,
+    `import React, { Component } from 'react'
+
+class ${page} extends Component {
+  render() {
+    return <div>${page}</div>;
+  }
+}
+
+export default ${page}
+`
+  )
 }
 
 const createContainer = (feature, container) => {
@@ -40,7 +69,7 @@ const createContainer = (feature, container) => {
 
 class ${container} extends Component {
   render() {
-    return <div>${container}</div>;
+    return <div>{this.props.children}</div>;
   }
 }
 
@@ -107,6 +136,8 @@ prog
       createComponent(feature, name)
     } else if (type === 'container') {
       createContainer(feature, name)
+    } else if (type === 'page') {
+      createPage(feature, name)
     }
   })
 
