@@ -1,8 +1,8 @@
 {
-  "name": "subvisual-boilerplate",
+  "name": "react_starter",
   "version": "1.0.0",
-  "description": "A builder for React.",
-  "main": "index.js",
+  "description": "Boilerplate for React applications.",
+  "main": "src/index.js",
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html",
