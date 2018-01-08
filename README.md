@@ -11,6 +11,7 @@ This project is a starter project to build React applications. In includes:
 * Eslint
 * Prettier
 * Stylelint
+* Babel
 
 Prerequisites:
 
